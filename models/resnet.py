@@ -83,25 +83,29 @@ class ResNetBlock(nn.Module):
 
         return output_features
     
-class ResNet18(nn.Module):
+class ResNet(nn.Module):
     '''
-    Residual network with 18 layers (ResNet18)
+    Residual network
 
     Arg(s):
+		n_layers : int
+			number of layers (18 or 34)
         n_input_feature : int
             number of input features
-        n_output : int
-            number of output classes
         batch_norm : bool
             whether or not to use batch normalization
     '''
-    def __init__(self, n_input_feature, n_output, batch_norm=False):
-        super(ResNet18, self).__init__()
+    
+    layer_counts = {18: [2, 2, 2, 2],
+                    34: [3, 4, 6, 3],}
+    
+    def __init__(self, n_layers, n_input_feature, batch_norm=False):
+        super(ResNet, self).__init__()
 
         if batch_norm:
             self.layer1 = nn.Sequential(
                 nn.Conv2d(n_input_feature, 64, kernel_size=7, stride=2, padding=3),
-                nn.BatchNorm(64),
+                nn.BatchNorm2d(64),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
                 nn.ReLU(inplace=True)
             )
@@ -111,27 +115,15 @@ class ResNet18(nn.Module):
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
                 nn.ReLU(inplace=True)
             )
+        
+        lc = self.layers_counts[n_layers]
+  
+        self.layer2 = self.make_layer(64, 64, lc[0], batch_norm)
+        self.layer3 = self.make_layer(64, 128, lc[1], batch_norm)
+        self.layer4 = self.make_layer(128, 256, lc[2], batch_norm)
+        self.layer5 = self.make_layer(256, 512, lc[3], batch_norm)
 
-        self.layer2 = nn.Sequential(
-            ResNetBlock(64, 64, 1, batch_norm),
-            ResNetBlock(64, 64, 1, batch_norm),
-        )
-
-        self.layer3 = nn.Sequential(
-            ResNetBlock(64, 128, 2, batch_norm),
-            ResNetBlock(128, 128, 1, batch_norm),
-        )
-
-        self.layer4 = nn.Sequential(
-            ResNetBlock(128, 256, 2, batch_norm),
-            ResNetBlock(256, 256, 1, batch_norm),
-        )
-
-        self.layer5 = nn.Sequential(
-            ResNetBlock(256, 512, 2, batch_norm),
-            ResNetBlock(512, 512, 1, batch_norm),
-        )
-
+		# make output sizes match
         self.layer6 = nn.Sequential(
             ResNetBlock(512, 256, 2, batch_norm),
             ResNetBlock(256, 128, 2, batch_norm),
@@ -140,7 +132,20 @@ class ResNet18(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
 
         # self.output = nn.Linear(512, n_output)
-
+    
+    def make_layer(input, output, count, batch_norm):
+        layers = []
+        if input == output:
+            layers.append(ResNetBlock(input, output, 1, batch_norm))
+        else:
+            layers.append(ResNetBlock(input, output, 2, batch_norm))
+        count -= 1
+        
+        while count > 0:
+            layers.append(ResNetBlock(output, output, 1, batch_norm))
+            
+        return nn.Sequential(*layers)
+            
 
     def forward(self, x):
         '''
