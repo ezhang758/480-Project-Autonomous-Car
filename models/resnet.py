@@ -96,8 +96,10 @@ class ResNet(nn.Module):
             whether or not to use batch normalization
     '''
     
-    layer_counts = {18: [2, 2, 2, 2],
-                    34: [3, 4, 6, 3],}
+    layer_counts = {
+        18: [2, 2, 2, 2],
+        34: [3, 4, 6, 3],
+    }
     
     def __init__(self, n_layers, n_input_feature, batch_norm=False):
         super(ResNet, self).__init__()
@@ -116,12 +118,12 @@ class ResNet(nn.Module):
                 nn.ReLU(inplace=True)
             )
         
-        lc = self.layers_counts[n_layers]
+        self.lc = self.layers_counts[n_layers]
   
-        self.layer2 = self.make_layer(64, 64, lc[0], batch_norm)
-        self.layer3 = self.make_layer(64, 128, lc[1], batch_norm)
-        self.layer4 = self.make_layer(128, 256, lc[2], batch_norm)
-        self.layer5 = self.make_layer(256, 512, lc[3], batch_norm)
+        self.layer2 = self.make_layer(64, 64, self.lc[0], batch_norm)
+        self.layer3 = self.make_layer(64, 128, self.lc[1], batch_norm)
+        self.layer4 = self.make_layer(128, 256, self.lc[2], batch_norm)
+        self.layer5 = self.make_layer(256, 512, self.lc[3], batch_norm)
 
 		# make output sizes match
         self.layer6 = nn.Sequential(
@@ -133,7 +135,23 @@ class ResNet(nn.Module):
 
         # self.output = nn.Linear(512, n_output)
     
-    def make_layer(input, output, count, batch_norm):
+    def make_layer(self, input, output, count, batch_norm):
+        '''
+        Construct block of layers for ResNet
+
+        Arg(s):
+            input : int
+                input dimensions
+            output : int
+                output dimensions
+            count : int
+                number of layers in block
+            batch_norm : bool
+                whether or not to use batch normalization
+        Returns:
+            nn.Sequential
+                layer
+        '''
         layers = []
         if input == output:
             layers.append(ResNetBlock(input, output, 1, batch_norm))
@@ -143,6 +161,7 @@ class ResNet(nn.Module):
         
         while count > 0:
             layers.append(ResNetBlock(output, output, 1, batch_norm))
+            count -= 1
             
         return nn.Sequential(*layers)
             
