@@ -1,1 +1,1 @@
-# 480-Project-Autonomous-Car
+# CPSC 480 Final Project: Autonomous Car Orientation Detection
