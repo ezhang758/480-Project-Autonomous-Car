@@ -5,6 +5,7 @@ from torch.optim import lr_scheduler
 from models.unet import UNet
 from utils.utils import criterion
 from argparse import ArgumentParser
+from utils.dataset import CarDataset
 
 def train_model(model, optimizer, train_loader, n_epochs):
     model.train()
@@ -33,6 +34,7 @@ def train_model(model, optimizer, train_loader, n_epochs):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
+    parser.add_argument('-path')
     parser.add_argument('-m', '--model', type=str, default="VGGNet-11")
     parser.add_argument('-n', '--n_epochs', type=int, default=5)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.001)
@@ -46,6 +48,11 @@ if __name__ == "__main__":
     n_classes = 8 # 8 classes: x, y, z, yaw, pitch_sin, pitch_cos, roll
     lr = args.learning_rate
     
+    train_images_dir = args.path + 'train_images/{}.jpg'
+    df_train, df_dev = train_test_split(train, test_size=0.01, random_state=42)
+    train_dataset = CarDataset(df_train, train_images_dir, training=True)
+ 
+    # Define model, optimizer, and learning rate scheduler
     model = UNet(backbone_model, n_classes).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=max(n_epochs, 10) * len(train_loader) // 3, gamma=0.1)
