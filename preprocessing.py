@@ -14,6 +14,7 @@ IMG_WIDTH = 1024
 IMG_HEIGHT = IMG_WIDTH // 16 * 5
 MODEL_SCALE = 8
 BATCH_SIZE = 4
+IMG_SHAPE = None
 
 camera_matrix = np.array([[2304.5479, 0,  1686.2379],
                           [0, 2305.8757, 1354.9849],
