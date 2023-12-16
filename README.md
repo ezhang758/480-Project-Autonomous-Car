@@ -4,7 +4,7 @@
 
 Set up the environment with
 ```
-conda env create -f car.yaml
+conda env create -f car.yml
 ```
 
 Activate environment with 
