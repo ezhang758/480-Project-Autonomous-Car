@@ -3,7 +3,7 @@ from models.unet import UNet
 import torch
 from utils.utils import criterion
 import pandas as pd
-from CarDataset import CarDataset
+from preprocessing import CarDataset
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from preprocessing import convert_3d_to_2d, optimize_xy, clear_duplicates, extract_coords, coords2str
@@ -15,7 +15,7 @@ def evaluate_model_loss(model, test_loader, device='cpu'):
     loss = 0
     
     with torch.no_grad():
-        for img_batch, mask_batch, regr_batch in test_loader:
+        for img_batch, mask_batch, regr_batch in tqdm(test_loader):
             img_batch = img_batch.to(device)
             mask_batch = mask_batch.to(device)
             regr_batch = regr_batch.to(device)
@@ -60,16 +60,18 @@ def evaluate_model_prediction(model, test_loader, device, df_test, filename):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-m', '--model', type=str, default="VGGNet-11")
+    parser.add_argument('-dp', '--data_path', type=str, default='./data/dataset')
+    parser.add_argument('-cp', '--checkpoints_path', type=str, default='./data/checkpoints')
+    parser.add_argument('-m', '--model', type=str, default="VGGNet-19")
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-d', '--device', type=str, default='cpu')
-    parser.add_argument('-ls', '--calculate_map', type=bool, default=True)
+    parser.add_argument('-ls', '--calculate_map', type=bool, default=False)
     parser.add_argument('-f', '--filename', type=str, default="predictions.csv")
     args = parser.parse_args()
     
     # load data
-    test_images_dir = args.path + 'train_images/{}.jpg'
-    df_test = pd.read_csv("test.csv")
+    test_images_dir = args.data_path + '{}.jpg'
+    df_test = pd.read_csv(args.data_path + "test.csv")
     test_dataset = CarDataset(df_test, test_images_dir, training=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)
 
@@ -78,13 +80,13 @@ if __name__ == '__main__':
     device = torch.device(device)
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    backbone_model = args.models
+    backbone_model = args.model
     n_classes = 8
     
     # Load model
     model = UNet(backbone_model, n_classes).to(device)
-    checkpoint = torch.load(f'./UNet_{backbone_model}.pth', map_location=torch.device('cpu'))
-    model.load_state_dict(checkpoint['state_dict'])
+    checkpoint = torch.load(args.checkpoints_path + f'UNet_{backbone_model}.pth', map_location=torch.device('cpu'))
+    model.load_state_dict(checkpoint['state_dict'], strict=False)
     
     if (args.calculate_map == True):
         evaluate_model_prediction(model, test_loader, device, df_test, args.filename)

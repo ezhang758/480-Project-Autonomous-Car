@@ -4,7 +4,7 @@ import numpy as np
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # same feature in different locations should get different results.
-def get_mesh(self, batch_size, shape_x, shape_y):
+def get_mesh(batch_size, shape_x, shape_y):
 	mg_x, mg_y = np.meshgrid(np.linspace(0, 1, shape_y), np.linspace(0, 1, shape_x))
 	mg_x = np.tile(mg_x[None, None, :, :], [batch_size, 1, 1, 1]).astype('float32')
 	mg_y = np.tile(mg_y[None, None, :, :], [batch_size, 1, 1, 1]).astype('float32')

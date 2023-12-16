@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from resnet import ResNet
-from vggnet import VGGNet
+from models.resnet import ResNet
+from models.vggnet import VGGNet
 from utils.utils import get_mesh
 
 class up(nn.Module):

@@ -5,7 +5,7 @@ from torch.optim import lr_scheduler
 from models.unet import UNet
 from utils.utils import criterion
 from argparse import ArgumentParser
-from utils.dataset import CarDataset
+from preprocessing import CarDataset
 from torch.utils.data import DataLoader
 import pickle
 import pandas as pd
@@ -52,8 +52,8 @@ if __name__ == "__main__":
     n_classes = 8 # 8 classes: x, y, z, yaw, pitch_sin, pitch_cos, roll
     lr = args.learning_rate
     
-    train_images_dir = args.path + 'train_images/{}.jpg'
-    df_train = pd.read_csv("train.csv")
+    train_images_dir = args.path + '{}.jpg'
+    df_train = pd.read_csv(args.path + "train.csv")
     train_dataset = CarDataset(df_train, train_images_dir, training=True)
     train_loader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=2)
 
