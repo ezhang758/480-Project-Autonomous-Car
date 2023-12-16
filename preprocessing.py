@@ -244,6 +244,7 @@ def convert_3d_to_2d(x, y, z, fx = 2304.5479, fy = 2305.8757, cx = 1686.2379, cy
     return x * fx / z + cx, y * fy / z + cy
 
 def optimize_xy(r, c, x0, y0, z0, xzy_slope, flipped=False):
+    xzy_slope = pickle.load(open('./data/dataset/' + "xzy_slope.sav", 'rb'))
     def distance_fn(xyz):
         x, y, z = xyz
         xx = -x if flipped else x

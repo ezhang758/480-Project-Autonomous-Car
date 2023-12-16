@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
-from models.unet import UNet
+# from models.unet import UNet
+from models.unet import MyUNet
 import torch
 from utils.utils import criterion
 import pandas as pd
@@ -8,6 +9,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from preprocessing import convert_3d_to_2d, optimize_xy, clear_duplicates, extract_coords, coords2str
 from mAP import calculate_map_image, plot_map_statistis
+import matplotlib.pyplot as plt 
 
 def evaluate_model_loss(model, test_loader, device='cpu'):
     model.eval()
@@ -38,7 +40,7 @@ def generate_df_map(filename):
     plot_map_statistis(pred_df)
     return pred_df
 
-def evaluate_model_prediction(model, test_loader, device, df_test, filename):
+def evaluate_model_prediction(model, test_loader, device, df_test, filename, path):
     predictions = []
 
     model.eval()
@@ -48,7 +50,7 @@ def evaluate_model_prediction(model, test_loader, device, df_test, filename):
             output = model(img.to(device))
         output = output.data.cpu().numpy()
         for out in output:
-            coords = extract_coords(out)
+            coords = extract_coords(out, path)
             s = coords2str(coords)
             predictions.append(s)
 
@@ -74,6 +76,9 @@ if __name__ == '__main__':
     df_test = pd.read_csv(args.data_path + "test.csv")
     test_dataset = CarDataset(df_test, test_images_dir, training=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=args.batch_size, shuffle=False, num_workers=0)
+    # img, mask, reg = test_dataset[0]
+    # print("print imag")
+    # plt.imshow(img)
 
     # choose device
     device = 'cuda' if args.device == 'gpu' or args.device == 'cuda' else 'cpu'
@@ -84,12 +89,13 @@ if __name__ == '__main__':
     n_classes = 8
     
     # Load model
-    model = UNet(backbone_model, n_classes).to(device)
+    # model = UNet(backbone_model, n_classes).to(device)
+    model = MyUNet(backbone_model, 8).to(device)
     checkpoint = torch.load(args.checkpoints_path + f'UNet_{backbone_model}.pth', map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['state_dict'], strict=False)
     
     if (args.calculate_map == True):
-        evaluate_model_prediction(model, test_loader, device, df_test, args.filename)
+        evaluate_model_prediction(model, test_loader, device, df_test, args.filename, args.data_path)
     else:
         evaluate_model_loss(model, test_loader, device)
 
