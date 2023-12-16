@@ -37,7 +37,7 @@ def train_model(model, optimizer, train_loader, n_epochs):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('-path')
+    parser.add_argument('-path', default="./data/dataset/")
     parser.add_argument('-m', '--model', type=str, default="VGGNet-11")
     parser.add_argument('-n', '--n_epochs', type=int, default=5)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.001)

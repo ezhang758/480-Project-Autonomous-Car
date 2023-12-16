@@ -60,9 +60,9 @@ def evaluate_model_prediction(model, test_loader, device, df_test, filename):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-dp', '--data_path', type=str, default='./data/dataset')
-    parser.add_argument('-cp', '--checkpoints_path', type=str, default='./data/checkpoints')
-    parser.add_argument('-m', '--model', type=str, default="VGGNet-19")
+    parser.add_argument('-dp', '--data_path', type=str, default='./data/dataset/')
+    parser.add_argument('-cp', '--checkpoints_path', type=str, default='./data/checkpoints/')
+    parser.add_argument('-m', '--model', type=str, default="VGGNet-11")
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-d', '--device', type=str, default='cpu')
     parser.add_argument('-ls', '--calculate_map', type=bool, default=False)
