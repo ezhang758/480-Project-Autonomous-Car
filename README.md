@@ -13,9 +13,10 @@ conda activate car
 ```
 
 ### Run
-Run `setup.sh` to download the data and run and evaluate the saved model checkpoint. By default, `setup.sh` loads the pretrained CenterNet model with the VGGNet-11 backbone and evaluates the result.
+Run 
+```setup.sh``` to download the data and run and evaluate the saved model checkpoint. By default, `setup.sh` loads the pretrained CenterNet model with the VGGNet-11 backbone and evaluates the result.
 
-### Train
+##### Train
 If desired, `train.py` can be run to train the CenterNet model.
 The parameters are as follows:
 - `path (str, optional)`: Path to directory containing the dataset. Defaults to `./data/dataset/`
@@ -24,7 +25,7 @@ The parameters are as follows:
 - `learning_rate (int, optional)`: Learning rate. Defaults to 0.001
 - `batch_size (int, optional)`: Batch size. Defaults to 4
 
-### Evaluate
+##### Evaluate
 If desired, `evaluate.py` can be run to evaluate the CenterNet model.
 The parameters are as follows:
 - `data_path (str, optional)`: Path to directory containing the dataset. Defaults to `./data/dataset/`
