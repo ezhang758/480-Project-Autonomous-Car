@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 # from models.unet import UNet
-from models.unet import MyUNet
+from models.unet import UNet
 import torch
 from utils.utils import criterion
 import pandas as pd
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     
     # Load model
     # model = UNet(backbone_model, n_classes).to(device)
-    model = MyUNet(backbone_model, 8).to(device)
+    model = UNet(backbone_model, 8).to(device)
     checkpoint = torch.load(args.checkpoints_path + f'UNet_{backbone_model}.pth', map_location=torch.device('cpu'))
     model.load_state_dict(checkpoint['state_dict'], strict=False)
     

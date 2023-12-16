@@ -48,9 +48,9 @@ class up(nn.Module):
         x = self.conv(x)
         return x
 
-class MyUNet(nn.Module):
+class UNet(nn.Module):
     def __init__(self, model, n_classes):
-        super(MyUNet, self).__init__()
+        super(UNet, self).__init__()
         if model == "VGGNet-11":
             self.base_model = VGGNet11(3, n_classes)
         elif model == "VGGNet-19":
